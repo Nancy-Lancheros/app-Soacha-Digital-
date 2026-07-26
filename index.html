@@ -3,44 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Conectando Oportunidades - Carga de Evidencia</title>
+    <title>Conectando Oportunidades - Soacha</title>
     
-    <!-- Fuentes: Nunito para un aspecto amigable y legible -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Iconos: FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Tailwind CSS para los estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #f3f4f6; /* Fondo gris claro neutral */
-            /* Centrar la app en pantallas grandes simulando un celular */
+            background-color: #f3f4f6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            touch-action: manipulation; 
         }
-
-        /* Contenedor principal que simula la pantalla del móvil */
         .mobile-container {
             background-color: #ffffff;
             width: 100%;
-            max-width: 420px; /* Ancho máximo de celular */
+            max-width: 420px;
             min-height: 100vh;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
         }
-
         @media (min-width: 421px) {
             .mobile-container {
                 min-height: 850px;
@@ -48,45 +40,33 @@
                 border: 8px solid #1f2937;
             }
         }
-
-        /* Ocultar elementos visualmente pero mantenerlos funcionales (para el input de archivo) */
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* Animación suave para transiciones entre pantallas */
-        .fade-in {
-            animation: fadeIn 0.4s ease-in forwards;
-        }
+        .fade-in { animation: fadeIn 0.4s ease-in forwards; }
+        .pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .shake { animation: shake 0.5s; }
         
-        .pop-in {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        /* Utilidades para los interactivos */
+        .selected-word { border: 4px solid #f97316 !important; background-color: #ffedd5 !important; transform: scale(1.05); }
+        .matched-word { background-color: #22c55e !important; color: white !important; border-color: #16a34a !important; pointer-events: none; opacity: 0.5; }
+        .matched-dropzone { background-color: #22c55e !important; color: white !important; border-color: #16a34a !important; }
+        
+        /* Ocultar scrollbar para un look más limpio */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
 
     <div class="mobile-container">
         
-        <!-- PANTALLA 0: LOGIN (Visible por defecto) -->
         <div id="screen-login" class="flex flex-col h-full fade-in">
             <header class="bg-blue-600 text-white p-8 rounded-b-3xl shadow-lg text-center mb-4">
                 <div class="text-sm font-bold uppercase tracking-wider mb-2 opacity-90">Soacha Digital</div>
@@ -101,162 +81,504 @@
                     <label for="login-cedula" class="block text-gray-700 text-2xl font-extrabold mb-4">
                         Tu número de cédula:
                     </label>
-                    <!-- type="tel" fuerza a los celulares a abrir el teclado numérico grande -->
                     <input type="tel" id="login-cedula" class="w-full text-center text-4xl p-4 border-4 border-gray-200 rounded-3xl mb-8 focus:border-blue-500 focus:outline-none transition-colors text-gray-800 font-bold" placeholder="Ej: 12345678">
                     
                     <button id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-[40px] p-6 shadow-xl shadow-blue-200 text-3xl font-extrabold transition-all transform active:scale-95 flex items-center justify-center border-b-8 border-blue-800">
                         ENTRAR <i class="fa-solid fa-arrow-right ml-4"></i>
                     </button>
                 </div>
-                
-                <p class="text-gray-400 font-semibold mt-10 text-lg">
-                    <i class="fa-solid fa-shield-halved mr-2"></i> Ingreso seguro
-                </p>
             </main>
         </div>
 
-        <!-- PANTALLA 1: LA MISIÓN Y EL BOTÓN GIGANTE (Oculta por defecto ahora) -->
-        <div id="screen-task" class="hidden flex-col h-full fade-in">
-            
-            <!-- Encabezado superior -->
-            <header class="bg-orange-500 text-white p-6 rounded-b-3xl shadow-md text-center">
-                <div class="text-sm font-semibold uppercase tracking-wider mb-1 opacity-90">Soacha Digital</div>
-                <h1 class="text-2xl font-extrabold">Conectando Oportunidades</h1>
+        <div id="screen-dashboard" class="hidden flex-col h-full fade-in bg-gray-50">
+            <!-- Barra superior con puntos -->
+            <header class="bg-white p-4 rounded-b-3xl shadow-sm border-b-4 border-gray-200 flex justify-between items-center z-10">
+                <div class="flex items-center gap-2">
+                    <div class="bg-yellow-100 text-yellow-600 p-2 rounded-full"><i class="fa-solid fa-star text-xl"></i></div>
+                    <span id="score-display" class="font-extrabold text-2xl text-gray-800">0</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-bold text-gray-400 uppercase block">Progreso</span>
+                    <span id="progress-text" class="font-extrabold text-blue-600">0%</span>
+                </div>
             </header>
+            <!-- Barra de progreso visual -->
+            <div class="w-full bg-gray-200 h-2">
+                <div id="progress-bar" class="bg-green-500 h-2 transition-all duration-1000" style="width: 0%;"></div>
+            </div>
 
-            <!-- Contenido Principal -->
-            <main class="flex-1 p-6 flex flex-col justify-center items-center text-center">
+            <main class="flex-1 p-5 overflow-y-auto pb-20">
+                <h2 class="text-gray-800 font-extrabold text-2xl mb-6 text-center">Tus Módulos</h2>
                 
-                <!-- Tarjeta de la Misión -->
-                <div class="bg-blue-50 w-full rounded-3xl p-8 mb-10 shadow-sm border-2 border-blue-100">
-                    <div class="text-blue-500 text-5xl mb-4">
-                        <i class="fa-solid fa-envelope-open-text"></i>
+                <!-- Botón Módulo 1 (Siempre desbloqueado) -->
+                <button id="btn-mod1" onclick="openModule(1)" class="w-full bg-white rounded-3xl p-5 mb-4 shadow-md border-2 border-orange-200 flex items-center text-left transition-transform active:scale-95">
+                    <div class="bg-orange-100 text-orange-500 rounded-full w-16 h-16 flex-shrink-0 flex items-center justify-center mr-4 text-3xl">
+                        <i class="fa-solid fa-desktop"></i>
                     </div>
-                    <h2 class="text-gray-500 font-bold text-lg mb-2">MISIÓN DE HOY</h2>
-                    <p class="text-gray-800 font-extrabold text-3xl leading-tight">
-                        Abrir mi correo electrónico
-                    </p>
+                    <div class="flex-1">
+                        <span class="text-orange-600 font-bold text-xs uppercase tracking-wider block">Módulo 1</span>
+                        <span class="text-gray-800 font-extrabold text-lg leading-tight">El Computador</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-orange-300 text-xl"></i>
+                </button>
+
+                <!-- Módulo 2 -->
+                <button id="btn-mod2" onclick="openModule(2)" class="w-full bg-gray-100 rounded-3xl p-5 mb-4 border-2 border-gray-200 flex items-center text-left opacity-75 relative overflow-hidden transition-transform active:scale-95">
+                    <div class="bg-gray-200 text-gray-400 rounded-full w-16 h-16 flex-shrink-0 flex items-center justify-center mr-4 text-3xl icon-bg">
+                        <i class="fa-solid fa-lock icon-lock"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-gray-500 font-bold text-xs uppercase tracking-wider block module-label">Módulo 2</span>
+                        <span class="text-gray-600 font-extrabold text-lg leading-tight module-title">Internet Seguro</span>
+                    </div>
+                </button>
+
+                <!-- Módulo 3 -->
+                <button id="btn-mod3" onclick="openModule(3)" class="w-full bg-gray-100 rounded-3xl p-5 mb-4 border-2 border-gray-200 flex items-center text-left opacity-75 transition-transform active:scale-95">
+                    <div class="bg-gray-200 text-gray-400 rounded-full w-16 h-16 flex-shrink-0 flex items-center justify-center mr-4 text-3xl icon-bg">
+                        <i class="fa-solid fa-lock icon-lock"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-gray-500 font-bold text-xs uppercase tracking-wider block module-label">Módulo 3</span>
+                        <span class="text-gray-600 font-extrabold text-lg leading-tight module-title">Correo Electrónico</span>
+                    </div>
+                </button>
+
+                <!-- Módulo 4 -->
+                <button id="btn-mod4" onclick="openModule(4)" class="w-full bg-gray-100 rounded-3xl p-5 mb-4 border-2 border-gray-200 flex items-center text-left opacity-75 transition-transform active:scale-95">
+                    <div class="bg-gray-200 text-gray-400 rounded-full w-16 h-16 flex-shrink-0 flex items-center justify-center mr-4 text-3xl icon-bg">
+                        <i class="fa-solid fa-lock icon-lock"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-gray-500 font-bold text-xs uppercase tracking-wider block module-label">Módulo 4</span>
+                        <span class="text-gray-600 font-extrabold text-lg leading-tight module-title">Herramientas Google</span>
+                    </div>
+                </button>
+
+                <!-- Módulo 5 -->
+                <button id="btn-mod5" onclick="openModule(5)" class="w-full bg-gray-100 rounded-3xl p-5 mb-4 border-2 border-gray-200 flex items-center text-left opacity-75 transition-transform active:scale-95">
+                    <div class="bg-gray-200 text-gray-400 rounded-full w-16 h-16 flex-shrink-0 flex items-center justify-center mr-4 text-3xl icon-bg">
+                        <i class="fa-solid fa-lock icon-lock"></i>
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-gray-500 font-bold text-xs uppercase tracking-wider block module-label">Módulo 5</span>
+                        <span class="text-gray-600 font-extrabold text-lg leading-tight module-title">Trámites y Seguridad</span>
+                    </div>
+                </button>
+            </main>
+        </div>
+
+        <div id="screen-mod1" class="hidden flex-col h-full fade-in bg-white">
+            <header class="bg-orange-500 text-white p-4 flex items-center relative shadow-md">
+                <!-- EL BOTÓN PARA DEVOLVERSE -->
+                <button onclick="goBack('screen-mod1')" class="absolute left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h1 class="text-xl font-extrabold w-full text-center">Módulo 1</h1>
+            </header>
+            
+            <main class="flex-1 p-6 flex flex-col">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">Partes del equipo</h2>
+                <p class="text-gray-600 text-center font-semibold mb-6">Toca la palabra azul y luego toca el cuadro gris correcto.</p>
+                
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <button class="word-btn bg-blue-100 text-blue-700 border-2 border-blue-300 font-extrabold text-lg py-2 px-4 rounded-xl" data-part="monitor">Pantalla</button>
+                    <button class="word-btn bg-blue-100 text-blue-700 border-2 border-blue-300 font-extrabold text-lg py-2 px-4 rounded-xl" data-part="teclado">Teclado</button>
+                    <button class="word-btn bg-blue-100 text-blue-700 border-2 border-blue-300 font-extrabold text-lg py-2 px-4 rounded-xl" data-part="mouse">Ratón (Mouse)</button>
                 </div>
 
-                <!-- 
-                    El secreto técnico: Un label que envuelve un input de archivo. 
-                    El input está oculto, pero tocar el label gigante activa el input.
-                    accept="image/*" restringe a imágenes.
-                    capture="environment" fuerza a abrir la cámara trasera en móviles.
-                -->
-                <label for="camera-input" class="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-[40px] p-8 shadow-xl shadow-orange-200 cursor-pointer transition-all transform active:scale-95 flex flex-col items-center justify-center border-b-8 border-orange-600">
-                    <i class="fa-solid fa-camera text-7xl mb-4"></i>
-                    <span class="text-3xl font-extrabold">¡TOMAR FOTO!</span>
-                    <span class="text-lg mt-2 font-semibold opacity-90">de mi logro</span>
-                    
-                    <input type="file" id="camera-input" class="visually-hidden" accept="image/*" capture="environment">
-                </label>
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl border border-gray-200">
+                        <i class="fa-solid fa-display text-4xl text-gray-400 w-12 text-center"></i>
+                        <div class="dropzone flex-1 bg-white border-2 border-dashed border-gray-400 rounded-xl h-14 flex items-center justify-center text-gray-400 font-bold" data-target="monitor">Toca aquí</div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl border border-gray-200">
+                        <i class="fa-solid fa-keyboard text-4xl text-gray-400 w-12 text-center"></i>
+                        <div class="dropzone flex-1 bg-white border-2 border-dashed border-gray-400 rounded-xl h-14 flex items-center justify-center text-gray-400 font-bold" data-target="teclado">Toca aquí</div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl border border-gray-200">
+                        <i class="fa-solid fa-computer-mouse text-4xl text-gray-400 w-12 text-center"></i>
+                        <div class="dropzone flex-1 bg-white border-2 border-dashed border-gray-400 rounded-xl h-14 flex items-center justify-center text-gray-400 font-bold" data-target="mouse">Toca aquí</div>
+                    </div>
+                </div>
 
-                <p class="text-gray-400 font-semibold mt-8 text-lg">
-                    Toca el botón naranja para abrir tu cámara
-                </p>
-
+                <button id="btn-finish-mod1" onclick="completeModule(1)" class="hidden mt-auto mb-4 w-full bg-green-500 text-white rounded-full p-4 font-extrabold text-2xl shadow-lg border-b-4 border-green-700 active:scale-95 transition-transform">
+                    ¡TERMINAR MÓDULO!
+                </button>
             </main>
         </div>
 
-        <!-- PANTALLA 2: CARGANDO (Oculta por defecto) -->
-        <div id="screen-loading" class="hidden flex-col h-full w-full absolute top-0 left-0 bg-white justify-center items-center z-10">
-            <i class="fa-solid fa-spinner fa-spin text-orange-500 text-7xl mb-6"></i>
-            <h2 class="text-3xl font-bold text-gray-700">Subiendo tu foto...</h2>
-            <p class="text-xl text-gray-500 mt-2">Por favor espera un momento</p>
+        <div id="screen-mod2" class="hidden flex-col h-full fade-in bg-white">
+            <header class="bg-blue-500 text-white p-4 flex items-center relative shadow-md">
+                <button onclick="goBack('screen-mod2')" class="absolute left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h1 class="text-xl font-extrabold w-full text-center">Módulo 2</h1>
+            </header>
+            
+            <main class="flex-1 p-6 flex flex-col items-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">¿Cuál página es Segura?</h2>
+                <p class="text-gray-600 text-center font-semibold mb-8">Toca el sitio web que sea seguro para navegar.</p>
+
+                <!-- Opciones (Candado) -->
+                <button onclick="checkUrl(false, this)" class="w-full bg-red-50 border-2 border-red-200 rounded-2xl p-4 mb-4 flex items-center justify-between transition-colors">
+                    <span class="text-gray-700 font-bold text-lg">http://www.tramites-falsos.com</span>
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
+                </button>
+
+                <button onclick="checkUrl(true, this)" class="w-full bg-green-50 border-2 border-green-200 rounded-2xl p-4 mb-8 flex items-center justify-between transition-colors">
+                    <span class="text-gray-800 font-bold text-lg">https://www.alcaldiasoacha.gov.co</span>
+                    <i class="fa-solid fa-lock text-green-600 text-2xl"></i>
+                </button>
+
+                <div id="search-section" class="w-full hidden flex-col items-center pop-in mt-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Ahora haz una búsqueda</h2>
+                    <div class="w-full relative">
+                        <i class="fa-brands fa-google absolute left-4 top-4 text-blue-500 text-2xl"></i>
+                        <input type="text" id="input-search" class="w-full pl-12 pr-4 py-4 border-2 border-gray-300 rounded-full text-xl focus:border-blue-500 outline-none" placeholder="Alcaldía de Soacha">
+                    </div>
+                    <button onclick="completeModule(2)" class="mt-8 w-full bg-green-500 text-white rounded-full p-4 font-extrabold text-2xl shadow-lg border-b-4 border-green-700 active:scale-95 transition-transform">
+                        BUSCAR Y TERMINAR
+                    </button>
+                </div>
+            </main>
         </div>
 
-        <!-- PANTALLA 3: ÉXITO (Oculta por defecto) -->
-        <div id="screen-success" class="hidden flex-col h-full w-full absolute top-0 left-0 bg-green-50 justify-center items-center p-8 text-center z-20">
+        <div id="screen-mod3" class="hidden flex-col h-full fade-in bg-white">
+            <header class="bg-red-500 text-white p-4 flex items-center relative shadow-md">
+                <button onclick="goBack('screen-mod3')" class="absolute left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h1 class="text-xl font-extrabold w-full text-center">Módulo 3</h1>
+            </header>
             
-            <div class="bg-green-500 text-white rounded-full w-48 h-48 flex items-center justify-center mb-8 shadow-2xl shadow-green-200 pop-in">
-                <i class="fa-solid fa-check text-8xl"></i>
-            </div>
-            
-            <h2 class="text-5xl font-extrabold text-green-700 mb-4 pop-in" style="animation-delay: 0.2s;">¡FELICIDADES!</h2>
-            <p class="text-2xl text-gray-700 font-bold mb-12 pop-in" style="animation-delay: 0.4s;">
-                Tu evidencia se guardó correctamente.
-            </p>
+            <main class="flex-1 p-6 flex flex-col">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Enviar un Correo</h2>
+                
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
+                    <label class="text-sm font-bold text-gray-500">Para:</label>
+                    <input type="email" class="w-full border-b-2 border-gray-300 bg-transparent py-2 text-lg focus:outline-none focus:border-red-500" value="profesor@soacha.gov.co" readonly>
+                </div>
 
-            <!-- Botón para reiniciar y hacer otra prueba -->
-            <button id="btn-reset" class="pop-in bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xl py-4 px-10 rounded-full transition-colors mt-auto mb-8 w-full border-b-4 border-gray-300 active:border-b-0 active:mt-[auto+4px]" style="animation-delay: 0.6s;">
-                Volver al inicio
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
+                    <label class="text-sm font-bold text-gray-500">Asunto:</label>
+                    <input type="text" class="w-full border-b-2 border-gray-300 bg-transparent py-2 text-lg focus:outline-none focus:border-red-500" placeholder="Escribe aquí..." id="email-subject">
+                </div>
+
+                <!-- Botón de Cámara Real -->
+                <div class="relative w-full mb-auto mt-4">
+                    <label for="camera-upload" class="w-full bg-blue-100 text-blue-700 border-2 border-blue-400 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-transform">
+                        <i class="fa-solid fa-camera text-5xl mb-2"></i>
+                        <span class="font-extrabold text-xl">Adjuntar Foto</span>
+                    </label>
+                    <!-- Permite tomar foto directamente en móviles -->
+                    <input type="file" id="camera-upload" accept="image/*" capture="environment" class="hidden" onchange="enableSendEmail()">
+                </div>
+
+                <button id="btn-send-email" onclick="completeModule(3)" class="mt-8 w-full bg-gray-300 text-gray-500 rounded-full p-4 font-extrabold text-2xl shadow-sm transition-colors pointer-events-none">
+                    ENVIAR CORREO <i class="fa-solid fa-paper-plane ml-2"></i>
+                </button>
+            </main>
+        </div>
+
+        <div id="screen-mod4" class="hidden flex-col h-full fade-in bg-white">
+            <header class="bg-yellow-500 text-white p-4 flex items-center relative shadow-md">
+                <button onclick="goBack('screen-mod4')" class="absolute left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h1 class="text-xl font-extrabold w-full text-center">Módulo 4</h1>
+            </header>
+            
+            <main class="flex-1 p-6 flex flex-col">
+                <div class="flex items-center gap-3 mb-4 justify-center text-blue-600">
+                    <i class="fa-solid fa-file-word text-4xl"></i>
+                    <h2 class="text-2xl font-bold text-gray-800">Crear Documento</h2>
+                </div>
+
+                <p class="text-gray-600 text-center font-semibold mb-4">Escribe un texto en la hoja en blanco y luego guárdalo.</p>
+
+                <!-- Simulación de Hoja en Blanco -->
+                <div class="flex-1 bg-white rounded-xl shadow-lg border-2 border-gray-200 mb-6 p-6 relative focus-within:border-blue-400 transition-colors">
+                    <textarea class="w-full h-full resize-none outline-none text-gray-700 text-xl font-medium bg-transparent" placeholder="Empieza a escribir tu documento aquí..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <button onclick="checkDocsBtn(this)" class="docs-btn flex flex-col items-center bg-gray-100 p-4 rounded-2xl border-2 border-gray-300 active:scale-95">
+                        <i class="fa-brands fa-google-drive text-3xl text-green-600 mb-2"></i>
+                        <span class="font-bold text-gray-700">Guardar</span>
+                    </button>
+                    <button onclick="checkDocsBtn(this)" class="docs-btn flex flex-col items-center bg-gray-100 p-4 rounded-2xl border-2 border-gray-300 active:scale-95">
+                        <i class="fa-solid fa-share-nodes text-3xl text-blue-500 mb-2"></i>
+                        <span class="font-bold text-gray-700">Compartir</span>
+                    </button>
+                </div>
+                
+                <button id="btn-finish-mod4" onclick="completeModule(4)" class="hidden mt-6 w-full bg-green-500 text-white rounded-full p-4 font-extrabold text-2xl shadow-lg border-b-4 border-green-700 active:scale-95 transition-transform pop-in">
+                    CONTINUAR
+                </button>
+            </main>
+        </div>
+
+        <div id="screen-mod5" class="hidden flex-col h-full fade-in bg-white">
+            <header class="bg-teal-600 text-white p-4 flex items-center relative shadow-md">
+                <button onclick="goBack('screen-mod5')" class="absolute left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h1 class="text-xl font-extrabold w-full text-center">Módulo 5</h1>
+            </header>
+            
+            <main class="flex-1 p-6 flex flex-col items-center text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Trámites y Seguridad</h2>
+                
+                <!-- Barra de Navegación Simulada -->
+                <div id="browser-section" class="w-full flex flex-col pop-in">
+                    <p class="text-gray-600 font-semibold mb-6">Escribe la dirección web (URL) para ingresar a buscar tu trámite.</p>
+                    <div class="flex items-center bg-gray-100 rounded-full p-2 mb-6 border-4 border-gray-200 focus-within:border-teal-500 transition-colors">
+                        <i class="fa-solid fa-globe text-gray-400 ml-4 text-2xl"></i>
+                        <input type="text" id="url-input" class="flex-1 bg-transparent border-none outline-none px-4 text-xl text-gray-700" placeholder="Ej: www.soacha.gov.co">
+                        <button onclick="simulateNavigation()" class="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8 py-3 font-bold text-xl active:scale-95 transition-transform shadow-md">IR</button>
+                    </div>
+                </div>
+
+                <!-- Simulación Descarga -->
+                <div id="download-section" class="w-full hidden pop-in">
+                    <p class="text-gray-600 font-semibold mb-6">Estás en la página. Necesitas descargar tu certificado médico. Toca el botón correcto.</p>
+                    <button onclick="showPasswordTest()" class="w-full bg-teal-500 text-white rounded-2xl p-6 font-extrabold text-2xl shadow-lg border-b-4 border-teal-700 active:scale-95 flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-file-arrow-down text-3xl"></i>
+                        DESCARGAR
+                    </button>
+                    <div class="mt-6 text-sm text-gray-400">Anuncio: Hazte millonario aquí (No tocar)</div>
+                </div>
+
+                <!-- Test Contraseña -->
+                <div id="password-section" class="w-full hidden flex-col pop-in">
+                    <p class="text-gray-600 font-semibold mb-6 text-lg">Para proteger tus datos, ¿Cuál contraseña es más segura?</p>
+                    
+                    <div class="flex flex-col gap-3 w-full">
+                        <button onclick="checkPassword(false, this)" class="bg-gray-100 border-2 border-gray-300 p-4 rounded-xl font-bold text-xl text-gray-700 transition-colors">123456</button>
+                        <button onclick="checkPassword(false, this)" class="bg-gray-100 border-2 border-gray-300 p-4 rounded-xl font-bold text-xl text-gray-700 transition-colors">juan123</button>
+                        <button onclick="checkPassword(false, this)" class="bg-gray-100 border-2 border-gray-300 p-4 rounded-xl font-bold text-xl text-gray-700 transition-colors">Casa2024</button>
+                        <!-- La correcta -->
+                        <button onclick="checkPassword(true, this)" class="bg-gray-100 border-2 border-gray-300 p-4 rounded-xl font-bold text-xl text-gray-700 transition-colors">MiAbuela#2026</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="screen-certificate" class="hidden flex-col h-full w-full absolute top-0 left-0 bg-blue-600 justify-center items-center p-8 text-center z-50">
+            <div class="bg-white text-yellow-500 rounded-full w-40 h-40 flex items-center justify-center mb-6 shadow-2xl pop-in">
+                <i class="fa-solid fa-award text-8xl"></i>
+            </div>
+            <h2 class="text-4xl font-extrabold text-white mb-2 pop-in" style="animation-delay: 0.2s;">¡FELICIDADES!</h2>
+            <p class="text-xl text-blue-100 font-bold mb-10 pop-in" style="animation-delay: 0.4s;">
+                Has completado tu Alfabetización Digital. Estás conectando oportunidades.
+            </p>
+            <button onclick="location.reload()" class="pop-in bg-white text-blue-700 font-extrabold text-2xl py-4 px-10 rounded-full transition-colors w-full border-b-4 border-gray-300 shadow-lg active:scale-95" style="animation-delay: 0.6s;">
+                VOLVER AL INICIO
             </button>
         </div>
 
     </div>
 
     <script>
-        // Obtenemos las referencias a nuestras pantallas y botones
-        const screenLogin = document.getElementById('screen-login');
+        // ESTADO GLOBAL DE LA APP
+        let currentPoints = 0;
+        let unlockedModules = 1;
+
+        // Función para cambiar pantallas
+        function showScreen(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden');
+            document.getElementById(hideId).classList.remove('flex');
+            document.getElementById(showId).classList.remove('hidden');
+            document.getElementById(showId).classList.add('flex');
+        }
+
+        // Función específica para el botón de Volver
+        function goBack(currentScreenId) {
+            showScreen(currentScreenId, 'screen-dashboard');
+        }
+
+        // 1. LOGIN
         const btnLogin = document.getElementById('btn-login');
         const inputCedula = document.getElementById('login-cedula');
-        
-        const cameraInput = document.getElementById('camera-input');
-        const screenTask = document.getElementById('screen-task');
-        const screenLoading = document.getElementById('screen-loading');
-        const screenSuccess = document.getElementById('screen-success');
-        const btnReset = document.getElementById('btn-reset');
-
-        // Lógica para el botón de Entrar (Login)
-        btnLogin.addEventListener('click', function() {
-            // Verificamos que el campo no esté vacío
+        btnLogin.addEventListener('click', () => {
             if(inputCedula.value.trim() !== '') {
-                // Ocultamos la pantalla de login
-                screenLogin.classList.add('hidden');
-                screenLogin.classList.remove('flex');
-                
-                // Mostramos la pantalla de la misión
-                screenTask.classList.remove('hidden');
-                screenTask.classList.add('flex');
+                showScreen('screen-login', 'screen-dashboard');
             } else {
-                // Si está vacío, ponemos el borde rojo por 1.5 segundos para indicar error visualmente
-                inputCedula.focus();
-                inputCedula.classList.add('border-red-500');
-                setTimeout(() => inputCedula.classList.remove('border-red-500'), 1500);
+                inputCedula.classList.add('border-red-500', 'shake');
+                setTimeout(() => inputCedula.classList.remove('border-red-500', 'shake'), 500);
             }
         });
 
-        // Escuchamos el evento 'change' del input de archivo. 
-        // Este evento se dispara cuando el usuario toma la foto y la acepta en su celular.
-        cameraInput.addEventListener('change', function(event) {
-            // Verificamos si realmente se seleccionó/tomó una foto
-            if (event.target.files && event.target.files.length > 0) {
-                
-                // 1. Ocultar la pantalla principal
-                screenTask.classList.add('hidden');
-                screenTask.classList.remove('flex');
-                
-                // 2. Mostrar la pantalla de carga (Simulación)
-                screenLoading.classList.remove('hidden');
-                screenLoading.classList.add('flex');
+        // ABRIR MÓDULOS DESDE EL DASHBOARD
+        function openModule(modNumber) {
+            if(modNumber <= unlockedModules) {
+                showScreen('screen-dashboard', `screen-mod${modNumber}`);
+            } else {
+                // Si está bloqueado, vibra
+                const btn = document.getElementById(`btn-mod${modNumber}`);
+                btn.classList.add('shake');
+                setTimeout(() => btn.classList.remove('shake'), 500);
+            }
+        }
 
-                // 3. Simulamos el tiempo que tardaría en subir la foto a un servidor (1.5 segundos)
-                setTimeout(() => {
-                    // Ocultar carga
-                    screenLoading.classList.add('hidden');
-                    screenLoading.classList.remove('flex');
+        // COMPLETAR MÓDULOS (GAMIFICACIÓN)
+        function completeModule(modNumber) {
+            // Dar puntos (100 por módulo) solo si es la primera vez
+            if(modNumber === unlockedModules) {
+                currentPoints += 100;
+                document.getElementById('score-display').innerText = currentPoints;
+                
+                // Actualizar barra de progreso (20% por módulo)
+                const progressPercentage = modNumber * 20;
+                document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+                document.getElementById('progress-text').innerText = `${progressPercentage}%`;
+                
+                // Desbloquear el siguiente
+                if(modNumber < 5) {
+                    unlockedModules++;
+                    const nextBtn = document.getElementById(`btn-mod${unlockedModules}`);
                     
-                    // Mostrar pantalla de éxito
-                    screenSuccess.classList.remove('hidden');
-                    screenSuccess.classList.add('flex');
-                }, 1500); // 1500 milisegundos = 1.5 segundos
+                    // Cambiar estilos visuales para que se vea desbloqueado
+                    nextBtn.classList.remove('bg-gray-100', 'border-gray-200', 'opacity-75');
+                    nextBtn.classList.add('bg-white', 'border-blue-200', 'shadow-md');
+                    
+                    // Cambiar icono
+                    const iconBg = nextBtn.querySelector('.icon-bg');
+                    iconBg.classList.remove('bg-gray-200', 'text-gray-400');
+                    iconBg.classList.add('bg-blue-100', 'text-blue-500');
+                    
+                    const icon = nextBtn.querySelector('.icon-lock');
+                    icon.classList.remove('fa-lock');
+                    icon.classList.add('fa-play'); // Play icon
+
+                    // Actualizar colores de texto
+                    nextBtn.querySelector('.module-label').classList.replace('text-gray-500', 'text-blue-600');
+                    nextBtn.querySelector('.module-title').classList.replace('text-gray-600', 'text-gray-800');
+                }
             }
+
+            // Regresar al dashboard o mostrar certificado si terminó todo
+            if(modNumber === 5) {
+                showScreen('screen-mod5', 'screen-certificate');
+            } else {
+                showScreen(`screen-mod${modNumber}`, 'screen-dashboard');
+            }
+        }
+
+
+        // --- LÓGICAS INTERNAS DE CADA MÓDULO ---
+
+        // Lógica Módulo 1 (Emparejar)
+        let selectedWord = null;
+        let matchesFound = 0;
+        const wordBtns = document.querySelectorAll('.word-btn');
+        const dropzones = document.querySelectorAll('.dropzone');
+        const btnFinishMod1 = document.getElementById('btn-finish-mod1');
+
+        wordBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if(e.target.classList.contains('matched-word')) return;
+                wordBtns.forEach(w => w.classList.remove('selected-word'));
+                e.target.classList.add('selected-word');
+                selectedWord = e.target.dataset.part;
+            });
         });
 
-        // Lógica para el botón de "Volver al inicio"
-        btnReset.addEventListener('click', function() {
-            // Reseteamos el input de archivo para que permita tomar otra foto
-            cameraInput.value = '';
-
-            // Ocultamos la pantalla de éxito
-            screenSuccess.classList.add('hidden');
-            screenSuccess.classList.remove('flex');
-
-            // Mostramos de nuevo la pantalla principal
-            screenTask.classList.remove('hidden');
-            screenTask.classList.add('flex');
+        dropzones.forEach(zone => {
+            zone.addEventListener('click', (e) => {
+                if(!selectedWord) return;
+                const targetPart = e.target.dataset.target;
+                if(selectedWord === targetPart) {
+                    e.target.innerHTML = `<i class="fa-solid fa-check mr-2"></i> Bien`;
+                    e.target.classList.add('matched-dropzone');
+                    const btn = document.querySelector(`.word-btn[data-part="${selectedWord}"]`);
+                    btn.classList.remove('selected-word');
+                    btn.classList.add('matched-word');
+                    selectedWord = null; 
+                    matchesFound++;
+                    if(matchesFound === 3) {
+                        btnFinishMod1.classList.remove('hidden');
+                        btnFinishMod1.classList.add('pop-in');
+                    }
+                } else {
+                    e.target.classList.add('shake', 'border-red-400');
+                    setTimeout(() => e.target.classList.remove('shake', 'border-red-400'), 500);
+                }
+            });
         });
+
+        // Lógica Módulo 2 (Internet)
+        function checkUrl(isSecure, btnElement) {
+            if(isSecure) {
+                btnElement.classList.replace('bg-green-50', 'bg-green-500');
+                btnElement.classList.replace('text-gray-800', 'text-white');
+                btnElement.querySelector('i').classList.replace('text-green-600', 'text-white');
+                document.getElementById('search-section').classList.remove('hidden');
+                document.getElementById('search-section').classList.add('flex');
+            } else {
+                btnElement.classList.add('shake', 'bg-red-200');
+                setTimeout(() => btnElement.classList.remove('shake', 'bg-red-200'), 500);
+            }
+        }
+
+        // Lógica Módulo 3 (Correo)
+        function enableSendEmail() {
+            const btnSend = document.getElementById('btn-send-email');
+            btnSend.classList.remove('bg-gray-300', 'text-gray-500', 'pointer-events-none');
+            btnSend.classList.add('bg-red-500', 'text-white', 'border-b-4', 'border-red-700', 'pop-in');
+        }
+
+        // Lógica Módulo 4 (Workspace)
+        let docsClicked = 0;
+        function checkDocsBtn(btn) {
+            if(btn.classList.contains('bg-green-100')) return; // Ya tocado
+            btn.classList.replace('bg-gray-100', 'bg-green-100');
+            btn.classList.add('border-green-400');
+            docsClicked++;
+            if(docsClicked === 2) {
+                document.getElementById('btn-finish-mod4').classList.remove('hidden');
+            }
+        }
+
+        // Lógica Módulo 5 (Seguridad)
+        function simulateNavigation() {
+            const urlInput = document.getElementById('url-input').value;
+            // Verificar que hayan escrito algo
+            if(urlInput.trim() !== '') {
+                // Ocultar buscador, mostrar botón de descarga
+                document.getElementById('browser-section').classList.add('hidden');
+                document.getElementById('browser-section').classList.remove('flex');
+                document.getElementById('download-section').classList.remove('hidden');
+            } else {
+                // Si está vacío, vibrar y poner rojo
+                const searchBox = document.getElementById('url-input').parentElement;
+                searchBox.classList.add('shake', 'border-red-400');
+                setTimeout(() => searchBox.classList.remove('shake', 'border-red-400'), 500);
+            }
+        }
+
+        function showPasswordTest() {
+            document.getElementById('download-section').classList.add('hidden');
+            document.getElementById('password-section').classList.remove('hidden');
+            document.getElementById('password-section').classList.add('flex');
+        }
+
+        function checkPassword(isCorrect, btnElement) {
+            if(isCorrect) {
+                btnElement.classList.replace('bg-gray-100', 'bg-green-500');
+                btnElement.classList.replace('text-gray-700', 'text-white');
+                setTimeout(() => completeModule(5), 1000); // Terminar todo!
+            } else {
+                btnElement.classList.replace('bg-gray-100', 'bg-red-200');
+                btnElement.classList.add('shake');
+                setTimeout(() => {
+                    btnElement.classList.remove('shake');
+                    btnElement.classList.replace('bg-red-200', 'bg-gray-100');
+                }, 500);
+            }
+        }
+
     </script>
 </body>
 </html>
